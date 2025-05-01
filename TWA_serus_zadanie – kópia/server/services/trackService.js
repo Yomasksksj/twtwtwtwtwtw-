@@ -5,28 +5,17 @@ const producerDAO = require('../data/producerDAO');
 class TrackService {
   async createTrack(trackData) {
     try {
-      // Check if track already exists with same name and artist
-      const existingTracks = await trackDAO.findByNameAndArtist(
-        trackData.nazov, 
-        trackData.interpret_meno, 
-        trackData.interpret_priezvisko
-      );
-      
-      if (existingTracks && existingTracks.length > 0) {
-        throw new Error('Skladba s týmto názvom a interpretom už existuje');
-      }
-      
-      // Validate availability
-      if (trackData.dostupnost && !['Dostupná', 'Nedostupná'].includes(trackData.dostupnost)) {
-        trackData.dostupnost = 'Dostupná'; // Default value if invalid
-      }
-      
       // If producer_id is provided, check if it exists
       if (trackData.id_producent) {
         const producer = await producerDAO.findById(trackData.id_producent);
         if (!producer) {
           throw new Error('Producer not found');
         }
+      }
+      
+      // Validate availability
+      if (trackData.dostupnost && !['Dostupná', 'Nedostupná'].includes(trackData.dostupnost)) {
+        trackData.dostupnost = 'Dostupná'; // Default value if invalid
       }
       
       // Create track in database
@@ -40,14 +29,6 @@ class TrackService {
     try {
       return await trackDAO.findByName(name);
     } catch (error) {
-      throw error;
-    }
-  }
-
-  async findByNameAndArtist(name, firstName, lastName) {
-    try {
-      return await trackDAO.findByNameAndArtist(name, firstName, lastName);
-    } catch (error) {    
       throw error;
     }
   }

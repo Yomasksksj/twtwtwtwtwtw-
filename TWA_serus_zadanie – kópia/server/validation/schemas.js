@@ -48,13 +48,12 @@ const loginSchema = {
 };
 
 // Schéma pre vytvorenie skladby
+// Updated part of validation/schemas.js for tracks
 const trackCreateSchema = {
   type: 'object',
-  required: ['nazov', 'interpret_meno', 'interpret_priezvisko', 'rok_vydania', 'cena'],
+  required: ['nazov', 'rok_vydania', 'cena'],
   properties: {
-    nazov: { type: 'string', minLength: 1, maxLength: 100, pattern: '^[A-Za-z0-9\\s\\-]+$' },
-    interpret_meno: { type: 'string', minLength: 1, maxLength: 50, pattern: '^[A-Za-zÀ-ž\\s]+$' },
-    interpret_priezvisko: { type: 'string', minLength: 1, maxLength: 50, pattern: '^[A-Za-zÀ-ž\\s]+$' },
+    nazov: { type: 'string', minLength: 1, maxLength: 100 },
     id_producent: { type: ['integer', 'null'] },
     rok_vydania: { type: 'integer', minimum: 1900, maximum: new Date().getFullYear() },
     cena: { type: 'number', minimum: 0 },
@@ -70,9 +69,7 @@ const trackCreateSchema = {
 const trackUpdateSchema = {
   type: 'object',
   properties: {
-    nazov: { type: 'string', minLength: 1, maxLength: 100, pattern: '^[A-Za-z0-9\\s\\-]+$' },
-    interpret_meno: { type: 'string', minLength: 1, maxLength: 50, pattern: '^[A-Za-zÀ-ž\\s]+$' },
-    interpret_priezvisko: { type: 'string', minLength: 1, maxLength: 50, pattern: '^[A-Za-zÀ-ž\\s]+$' },
+    nazov: { type: 'string', minLength: 1, maxLength: 100 },
     id_producent: { type: ['integer', 'null'] },
     rok_vydania: { type: 'integer', minimum: 1900, maximum: new Date().getFullYear() },
     cena: { type: 'number', minimum: 0 },

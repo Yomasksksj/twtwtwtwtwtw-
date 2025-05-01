@@ -1,22 +1,21 @@
+// data/trackDAO.js
 const { pool, sql } = require('../config/db.config');
 
 class TrackDAO {
   async create(track) {
-    const { nazov, interpret_meno, interpret_priezvisko, id_producent, rok_vydania, cena, dostupnost, popis, zanr, dlzka_min } = track;
+    const { nazov, id_producent, rok_vydania, cena, dostupnost, popis, zanr, dlzka_min } = track;
     
     try {
       await pool.connect();
       
       const query = `
-        INSERT INTO eshop.skladba (nazov, interpret_meno, interpret_priezvisko, id_producent, rok_vydania, cena, dostupnost, popis, zanr, dlzka_min) 
-        VALUES (@nazov, @interpret_meno, @interpret_priezvisko, @id_producent, @rok_vydania, @cena, @dostupnost, @popis, @zanr, @dlzka_min);
+        INSERT INTO eshop.skladba (nazov, id_producent, rok_vydania, cena, dostupnost, popis, zanr, dlzka_min) 
+        VALUES (@nazov, @id_producent, @rok_vydania, @cena, @dostupnost, @popis, @zanr, @dlzka_min);
         SELECT SCOPE_IDENTITY() AS id;
       `;
       
       const request = pool.request();
       request.input('nazov', sql.NVarChar, nazov);
-      request.input('interpret_meno', sql.NVarChar, interpret_meno);
-      request.input('interpret_priezvisko', sql.NVarChar, interpret_priezvisko);
       request.input('id_producent', sql.Int, id_producent || null);
       request.input('rok_vydania', sql.Int, rok_vydania);
       request.input('cena', sql.Decimal(10, 2), cena);
@@ -41,7 +40,7 @@ class TrackDAO {
     try {
       await pool.connect();
       const result = await pool.request().query(`
-        SELECT s.*, p.nazov_spolocnosti as producent_nazov, p.meno as producent_meno, p.priezvisko as producent_priezvisko 
+        SELECT s.*, p.nazov_spolocnosti as producent_nazov
         FROM eshop.skladba s
         LEFT JOIN eshop.producent p ON s.id_producent = p.id_producent
       `);
@@ -57,7 +56,7 @@ class TrackDAO {
       const request = pool.request();
       request.input('id', sql.Int, id);
       const result = await request.query(`
-        SELECT s.*, p.nazov_spolocnosti as producent_nazov, p.meno as producent_meno, p.priezvisko as producent_priezvisko 
+        SELECT s.*, p.nazov_spolocnosti as producent_nazov
         FROM eshop.skladba s
         LEFT JOIN eshop.producent p ON s.id_producent = p.id_producent
         WHERE s.id_skladby = @id
@@ -74,7 +73,7 @@ class TrackDAO {
       const request = pool.request();
       request.input('nazov', sql.NVarChar, name);
       const result = await request.query(`
-        SELECT s.*, p.nazov_spolocnosti as producent_nazov, p.meno as producent_meno, p.priezvisko as producent_priezvisko 
+        SELECT s.*, p.nazov_spolocnosti as producent_nazov
         FROM eshop.skladba s
         LEFT JOIN eshop.producent p ON s.id_producent = p.id_producent
         WHERE s.nazov = @nazov
@@ -85,30 +84,6 @@ class TrackDAO {
     }
   }
 
-  async findByNameAndArtist(name, firstName, lastName) {
-    try {
-      await pool.connect();
-      const request = pool.request();
-      request.input('nazov', sql.NVarChar, name);
-      request.input('meno', sql.NVarChar, firstName);
-      request.input('priezvisko', sql.NVarChar, lastName);
-      
-      const query = `
-        SELECT s.*, p.nazov_spolocnosti as producent_nazov, p.meno as producent_meno, p.priezvisko as producent_priezvisko 
-        FROM eshop.skladba s
-        LEFT JOIN eshop.producent p ON s.id_producent = p.id_producent
-        WHERE s.nazov = @nazov 
-        AND s.interpret_meno = @meno 
-        AND s.interpret_priezvisko = @priezvisko
-      `;
-      
-      const result = await request.query(query);
-      return result.recordset;
-    } catch (error) {
-      throw new Error(`Error finding track by name and artist: ${error.message}`);
-    }
-  }
-
   async findByProducerId(producerId) {
     try {
       await pool.connect();
@@ -116,7 +91,7 @@ class TrackDAO {
       request.input('producerId', sql.Int, producerId);
       
       const result = await request.query(`
-        SELECT s.*, p.nazov_spolocnosti as producent_nazov, p.meno as producent_meno, p.priezvisko as producent_priezvisko 
+        SELECT s.*, p.nazov_spolocnosti as producent_nazov
         FROM eshop.skladba s
         LEFT JOIN eshop.producent p ON s.id_producent = p.id_producent
         WHERE s.id_producent = @producerId

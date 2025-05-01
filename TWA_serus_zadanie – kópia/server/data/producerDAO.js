@@ -61,7 +61,7 @@ class ProducerDAO {
       await pool.connect();
       const request = pool.request();
       request.input('nazov', sql.NVarChar, name);
-      const result = await request.query('SELECT * FROM eshop.producent WHERE nazov_spolocnosti = @nazov');
+      const result = await request.query('SELECT * FROM eshop.producent WHERE meno = @nazov');
       return result.recordset;
     } catch (error) {
       throw new Error(`Error finding producer by name: ${error.message}`);
